@@ -31,7 +31,7 @@ We will obtain the tables on
 
 - Gender composition of resident population, and
 
-- household income from work.
+- Household income from work.
 
 ``` r
 url <- "https://en.wikipedia.org/wiki/Demographics_of_Singapore"
@@ -85,7 +85,7 @@ url_use <- bow(url)
 selector <- "#iMAS_SP_Summ"
 tables <- scrape(url_use) %>% html_elements(selector) %>% html_table() # list of 6
 df <- tables[[1]]
-df
+df %>% slice(-2)
 ```
 
 <div class="kable-table">
@@ -93,7 +93,6 @@ df
 | Mid-Year    | 2014  | 2015  | 2016  | 2017  | 2018  | 2019  | 2020  | 20​21  | 2022  | 2023  | 2024  |
 |:------------|:------|:------|:------|:------|:------|:------|:------|:------|:------|:------|:------|
 | Levels (\$) | 3,770 | 3,949 | 4,056 | 4,232 | 4,437 | 4,563 | 4,534 | 4,680 | 5,070 | 5,197 | 5,500 |
-| Mid-Year    | 2014  | 2015  | 2016  | 2017  | 2018  | 2019  | 2020  | 2021  | 2022  | 2023  | 2024  |
 
 </div>
 
@@ -179,12 +178,12 @@ head(df_carpark)
 
 | CarParkID | Area | Development | Location | AvailableLots | LotType | Agency |
 |:---|:---|:---|:---|---:|:---|:---|
-| 1 | Marina | Suntec City | 1.29375 103.85718 | 661 | C | LTA |
-| 2 | Marina | Marina Square | 1.29115 103.85728 | 1347 | C | LTA |
-| 3 | Marina | Raffles City | 1.29382 103.85319 | 546 | C | LTA |
-| 4 | Marina | The Esplanade | 1.29011 103.85561 | 615 | C | LTA |
-| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 602 | C | LTA |
-| 6 | Marina | Singapore Flyer | 1.28944 103.86311 | 252 | C | LTA |
+| 1 | Marina | Suntec City | 1.29375 103.85718 | 610 | C | LTA |
+| 2 | Marina | Marina Square | 1.29115 103.85728 | 1284 | C | LTA |
+| 3 | Marina | Raffles City | 1.29382 103.85319 | 519 | C | LTA |
+| 4 | Marina | The Esplanade | 1.29011 103.85561 | 599 | C | LTA |
+| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 572 | C | LTA |
+| 6 | Marina | Singapore Flyer | 1.28944 103.86311 | 251 | C | LTA |
 
 </div>
 
@@ -211,18 +210,18 @@ head(carpark_avail)
 
 | CarParkID | Area | Development | Location | AvailableLots | LotType | Agency | lat | lng |
 |:---|:---|:---|:---|---:|:---|:---|:---|:---|
-| 1 | Marina | Suntec City | 1.29375 103.85718 | 661 | C | LTA | 1.29375 | 103.85718 |
-| 2 | Marina | Marina Square | 1.29115 103.85728 | 1347 | C | LTA | 1.29115 | 103.85728 |
-| 3 | Marina | Raffles City | 1.29382 103.85319 | 546 | C | LTA | 1.29382 | 103.85319 |
-| 4 | Marina | The Esplanade | 1.29011 103.85561 | 615 | C | LTA | 1.29011 | 103.85561 |
-| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 602 | C | LTA | 1.29251 | 103.86009 |
-| 6 | Marina | Singapore Flyer | 1.28944 103.86311 | 252 | C | LTA | 1.28944 | 103.86311 |
+| 1 | Marina | Suntec City | 1.29375 103.85718 | 610 | C | LTA | 1.29375 | 103.85718 |
+| 2 | Marina | Marina Square | 1.29115 103.85728 | 1284 | C | LTA | 1.29115 | 103.85728 |
+| 3 | Marina | Raffles City | 1.29382 103.85319 | 519 | C | LTA | 1.29382 | 103.85319 |
+| 4 | Marina | The Esplanade | 1.29011 103.85561 | 599 | C | LTA | 1.29011 | 103.85561 |
+| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 572 | C | LTA | 1.29251 | 103.86009 |
+| 6 | Marina | Singapore Flyer | 1.28944 103.86311 | 251 | C | LTA | 1.28944 | 103.86311 |
 
 </div>
 
 ### Car park availability: Visualization
 
-Lastly, let’s try visualize the real-time car park availability. We will
+Lastly, let’s visualize the real-time car park availability. We will
 need an additional package,
 [leaflet](https://rstudio.github.io/leaflet/).
 
