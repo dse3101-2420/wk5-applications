@@ -2,7 +2,7 @@
 title: "Week 5 Applications"
 date: "2025-02-13"
 output: 
-  html_document:
+  github_document:
     toc: true
     toc_depth: 2
     fig_width: 10
@@ -140,22 +140,3 @@ there's also an API wrapper `R` package, `ltaer`, that helps us obtain data from
 carpark_avail <- ltaer::getCarparkAvail(Sys.getenv("LTA_KEY"))
 head(carpark_avail)
 ```
-
-### Car park availability: Visualization
-
-Lastly, let's visualize the real-time car park availability. We will need an additional package, [leaflet](https://rstudio.github.io/leaflet/).
-
-```{r}
-library(leaflet)
-df_carpark <- carpark_avail %>%
-  separate(Location, into = c("lat", "long"), sep = " ", convert = TRUE)
-
-# Visualization
-leaflet(df_carpark) %>%
-  addTiles() %>%
-  addCircleMarkers(lng = ~long, lat = ~lat,
-                   popup = ~paste0("Available slots: ", AvailableLots),
-                   radius = ~AvailableLots/100, stroke = FALSE, 
-                   fillOpacity = 0.5, color = "lightseagreen")
-```
-

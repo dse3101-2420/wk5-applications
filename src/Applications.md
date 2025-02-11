@@ -178,11 +178,11 @@ head(df_carpark)
 
 | CarParkID | Area | Development | Location | AvailableLots | LotType | Agency |
 |:---|:---|:---|:---|---:|:---|:---|
-| 1 | Marina | Suntec City | 1.29375 103.85718 | 540 | C | LTA |
-| 2 | Marina | Marina Square | 1.29115 103.85728 | 1242 | C | LTA |
-| 3 | Marina | Raffles City | 1.29382 103.85319 | 503 | C | LTA |
-| 4 | Marina | The Esplanade | 1.29011 103.85561 | 571 | C | LTA |
-| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 559 | C | LTA |
+| 1 | Marina | Suntec City | 1.29375 103.85718 | 502 | C | LTA |
+| 2 | Marina | Marina Square | 1.29115 103.85728 | 1199 | C | LTA |
+| 3 | Marina | Raffles City | 1.29382 103.85319 | 477 | C | LTA |
+| 4 | Marina | The Esplanade | 1.29011 103.85561 | 563 | C | LTA |
+| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 553 | C | LTA |
 | 6 | Marina | Singapore Flyer | 1.28944 103.86311 | 243 | C | LTA |
 
 </div>
@@ -210,30 +210,11 @@ head(carpark_avail)
 
 | CarParkID | Area | Development | Location | AvailableLots | LotType | Agency | lat | lng |
 |:---|:---|:---|:---|---:|:---|:---|:---|:---|
-| 1 | Marina | Suntec City | 1.29375 103.85718 | 540 | C | LTA | 1.29375 | 103.85718 |
-| 2 | Marina | Marina Square | 1.29115 103.85728 | 1242 | C | LTA | 1.29115 | 103.85728 |
-| 3 | Marina | Raffles City | 1.29382 103.85319 | 503 | C | LTA | 1.29382 | 103.85319 |
-| 4 | Marina | The Esplanade | 1.29011 103.85561 | 571 | C | LTA | 1.29011 | 103.85561 |
-| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 559 | C | LTA | 1.29251 | 103.86009 |
+| 1 | Marina | Suntec City | 1.29375 103.85718 | 502 | C | LTA | 1.29375 | 103.85718 |
+| 2 | Marina | Marina Square | 1.29115 103.85728 | 1199 | C | LTA | 1.29115 | 103.85728 |
+| 3 | Marina | Raffles City | 1.29382 103.85319 | 477 | C | LTA | 1.29382 | 103.85319 |
+| 4 | Marina | The Esplanade | 1.29011 103.85561 | 563 | C | LTA | 1.29011 | 103.85561 |
+| 5 | Marina | Millenia Singapore | 1.29251 103.86009 | 553 | C | LTA | 1.29251 | 103.86009 |
 | 6 | Marina | Singapore Flyer | 1.28944 103.86311 | 243 | C | LTA | 1.28944 | 103.86311 |
 
 </div>
-
-### Car park availability: Visualization
-
-Lastly, let’s visualize the real-time car park availability. We will
-need an additional package,
-[leaflet](https://rstudio.github.io/leaflet/).
-
-``` r
-library(leaflet)
-df_carpark <- carpark_avail %>%
-  separate(Location, into = c("lat", "long"), sep = " ", convert = TRUE)
-
-# Visualization
-leaflet(df_carpark) %>%
-  addTiles() %>%
-  addCircleMarkers(lng = ~long, lat = ~lat,
-                   popup = ~paste0("Available slots: ", AvailableLots),
-                   radius = ~AvailableLots/100, stroke = FALSE, fillOpacity = 0.5)
-```
