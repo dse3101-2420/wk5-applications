@@ -44,6 +44,7 @@ docs/
 
 # System files
 .DS_Store
+.env
 
 # translation temp files
 po/*~
