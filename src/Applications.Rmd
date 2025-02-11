@@ -2,7 +2,7 @@
 title: "Week 5 Applications"
 date: "2025-02-13"
 output: 
-  github_document:
+  html_document:
     toc: true
     toc_depth: 2
     fig_width: 10
@@ -145,7 +145,7 @@ head(carpark_avail)
 
 Lastly, let's visualize the real-time car park availability. We will need an additional package, [leaflet](https://rstudio.github.io/leaflet/).
 
-```{r eval = FALSE}
+```{r}
 library(leaflet)
 df_carpark <- carpark_avail %>%
   separate(Location, into = c("lat", "long"), sep = " ", convert = TRUE)
@@ -155,6 +155,7 @@ leaflet(df_carpark) %>%
   addTiles() %>%
   addCircleMarkers(lng = ~long, lat = ~lat,
                    popup = ~paste0("Available slots: ", AvailableLots),
-                   radius = ~AvailableLots/100, stroke = FALSE, fillOpacity = 0.5)
+                   radius = ~AvailableLots/100, stroke = FALSE, 
+                   fillOpacity = 0.5, color = "lightseagreen")
 ```
 
