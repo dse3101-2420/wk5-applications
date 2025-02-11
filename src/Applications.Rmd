@@ -1,0 +1,160 @@
+---
+title: "Week 5 Applications"
+date: "2025-02-13"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
+    fig_width: 10
+    fig_height: 4
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+# Load packages
+library(tidyverse)
+library(rvest)
+library(polite)
+library(httr)
+library(jsonlite)
+```
+
+# Web scrapping
+## Demographics in Singapore
+
+In the first practice,we shall visit the page https://en.wikipedia.org/wiki/Demographics_of_Singapore, which contain multiple tables for demographics in Singapore.
+
+We will obtain the tables on
+
++ Gender composition of resident population, and
+
++ household income from work.
+
+```{r}
+url <- "https://en.wikipedia.org/wiki/Demographics_of_Singapore"
+url_use <- bow(url)
+results <- scrape(url_use) %>% 
+  html_elements("table.wikitable") %>% html_table()
+gender_compo <- results[[5]]
+household_income <- results[[21]]
+```
+
+```{r}
+gender_compo
+```
+
+```{r}
+household_income
+```
+
+## Gross monthly income in Singapore
+
+Next, visit the page
+
+https://stats.mom.gov.sg/Pages/Income-Summary-Table.aspx
+
+And obtain the first table on the median gross monthly income from employment.
+
+```{r}
+url <- "https://stats.mom.gov.sg/Pages/Income-Summary-Table.aspx"
+url_use <- bow(url)
+selector <- "#iMAS_SP_Summ"
+tables <- scrape(url_use) %>% html_elements(selector) %>% html_table() # list of 6
+df <- tables[[1]]
+df
+```
+
+# Working with APIs
+## Real median household income
+
+As API calls to FRED requires an API key, we need to sign up for an API key first.
+
++ In the code below, my API key is retrieved in `Sys.getenv("FRED_KEY")`. This is one way to keep the API key secret. You can find out more about it [here](https://daattali.gitbooks.io/stat545-ubc-github-io/content/bit003_api-key-env-var.html).
+
+```{r}
+resource_url <- "https://api.stlouisfed.org/fred/series/observations"
+query_params = list(api_key = Sys.getenv("FRED_KEY"),
+                    series_id = "MEHOINUSA672N",
+                    file_type = "json")
+# Request data from the server
+res = GET(resource_url, query = query_params)
+
+# Parse JSON
+res_list <- content(res, type = "text") %>% fromJSON(flatten = TRUE)
+
+# Convert data into tibble
+income <- as_tibble(res_list$observations)
+head(income)
+```
+
+```{r}
+income %>%
+  mutate(year = year(date), value = as.numeric(value)) %>%
+  filter(year >= 1990) %>%
+  ggplot(aes(x = year, y = value)) +
+  geom_line(lwd = 2, color = "indianred4", alpha = 0.9) +
+  theme_minimal() +
+  labs(x = "", y = "", title = "Real Median Household Income in the US, 1990 to 2022",
+       caption = "Source: U.S. Census Bureau.")
+```
+
+## Realtime Carpark availability
+
+To query data from the LTA DataMall, we also need to request an API key.
+
++ In the code below, my API key is retrieved in `Sys.getenv("LTA_KEY")`.
+
++ Read the LTA's **documentation** for their APIs and understand how to set up the `GET()` requests.
+
+```{r}
+# Construct the resource URL
+resource_url <- "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailabilityv2"
+# Make the GET() request
+res <- GET(resource_url, 
+           add_headers(AccountKey = Sys.getenv("LTA_KEY"),
+                       accept = "application/json"))
+# Parse the returned data
+res_content <- content(res, as = "text")
+res_list <- fromJSON(res_content, flatten = TRUE)
+# Extract information from sub-list
+df_carpark <- as_tibble(res_list$value)
+head(df_carpark)
+```
+
+### The `ltaer` package
+
+there's also an API wrapper `R` package, `ltaer`, that helps us obtain data from the LTA DataMall.
+
++ Read the full documentation of the package [here](https://shaunkhoo.github.io/ltaer/index.html).
+
++ To obtain data via this API wrapper, we still need to supply our own API KEY.
+
++ The data set on carpark availability can be retrieved with:
+
+```{r}
+# Retrieve data on carpark availability
+carpark_avail <- ltaer::getCarparkAvail(Sys.getenv("LTA_KEY"))
+head(carpark_avail)
+```
+
+### Car park availability: Visualization
+
+Lastly, let's try visualize the real-time car park availability. We will need an additional package, [leaflet](https://rstudio.github.io/leaflet/).
+
+```{r eval = FALSE}
+library(leaflet)
+df_carpark <- carpark_avail %>%
+  separate(Location, into = c("lat", "long"), sep = " ", convert = TRUE)
+
+# Visualization
+leaflet(df_carpark) %>%
+  addTiles() %>%
+  addCircleMarkers(lng = ~long, lat = ~lat,
+                   popup = ~paste0("Available slots: ", AvailableLots),
+                   radius = ~AvailableLots/100, stroke = FALSE, fillOpacity = 0.5)
+```
+
